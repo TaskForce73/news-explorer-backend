@@ -1,0 +1,43 @@
+const express = require('express');
+require('dotenv').config();
+const mongoose = require('mongoose');
+const cors = require('cors');
+const helmet = require('helmet');
+const { errors } = require('celebrate');
+const { limiter } = require('./utils/limiter');
+const { requestLogger, errorLogger } = require('./utils/logger');
+const NotFoundError = require('./errors/notfounderror');
+
+const { PORT = 3000 } = process.env;
+
+const app = express();
+const usersRouter = require('./routes/users');
+const articlesRouter = require('./routes/articles');
+
+mongoose.connect('mongodb://localhost:27017/news-explorer');
+
+app.use(helmet());
+app.use(limiter);
+app.use(cors());
+app.options('*', cors());
+app.use(express.json());
+app.use(requestLogger);
+
+app.use('/', usersRouter);
+app.use('/', articlesRouter);
+
+app.use(errorLogger);
+app.use('*', (req, res, next) => {
+  next(new NotFoundError('Requested resourece was not found.'));
+});
+const serverErrorHandler = (err, req, res, next) => {
+  const { statusCode = 500, message } = err;
+  res.status(statusCode).send({
+    message: statusCode === 500 ? 'An error occurred on the server' : message,
+  });
+};
+app.use(serverErrorHandler);
+app.use(errors());
+app.listen(PORT, () => {
+    console.log(`App listening at port ${PORT}`);
+  });
