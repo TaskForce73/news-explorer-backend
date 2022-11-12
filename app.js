@@ -6,38 +6,27 @@ const helmet = require('helmet');
 const { errors } = require('celebrate');
 const { limiter } = require('./utils/limiter');
 const { requestLogger, errorLogger } = require('./utils/logger');
-const NotFoundError = require('./errors/notfounderror');
-
-const { PORT = 3000 } = process.env;
+const serverErrorHandler = require('./middleware/servererror');
+const { PORT, MONGO_DB } = require('./utils/config');
+const router = require('./routes');
 
 const app = express();
-const usersRouter = require('./routes/users');
-const articlesRouter = require('./routes/articles');
 
-mongoose.connect('mongodb://localhost:27017/news-explorer');
+mongoose.connect(MONGO_DB);
 
 app.use(helmet());
-app.use(limiter);
 app.use(cors());
 app.options('*', cors());
 app.use(express.json());
 app.use(requestLogger);
+app.use(limiter);
 
-app.use('/', usersRouter);
-app.use('/', articlesRouter);
+app.use(router);
 
 app.use(errorLogger);
-app.use('*', (req, res, next) => {
-  next(new NotFoundError('Requested resourece was not found.'));
-});
-const serverErrorHandler = (err, req, res, next) => {
-  const { statusCode = 500, message } = err;
-  res.status(statusCode).send({
-    message: statusCode === 500 ? 'An error occurred on the server' : message,
-  });
-};
-app.use(serverErrorHandler);
 app.use(errors());
+
+app.use(serverErrorHandler);
 app.listen(PORT, () => {
-    console.log(`App listening at port ${PORT}`);
-  });
+  console.log(`App listening at port ${PORT}`);
+});

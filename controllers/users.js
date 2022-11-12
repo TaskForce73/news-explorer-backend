@@ -6,7 +6,7 @@ const CastError = require('../errors/casterror');
 const ConflictError = require('../errors/conflicterror');
 const NotFoundError = require('../errors/notfounderror');
 
-const { JWT_SECRET, NODE_ENV } = process.env;
+const { JWT_SECRET } = require('../utils/config');
 
 module.exports.getUser = (req, res, next) => {
   User.findById(req.user._id)
@@ -15,9 +15,9 @@ module.exports.getUser = (req, res, next) => {
     })
     .then((user) => {
       if (user) {
- return res.status(200).send({ data: user });
+        return res.send({ data: user });
       }
-        throw new CastError('Invalid data.');
+      throw new CastError('Invalid data.');
     })
     .catch(next);
 };
@@ -31,21 +31,24 @@ module.exports.createUser = (req, res, next) => {
       email,
       password: hash,
     })
+      .catch((err) => {
+        if (err.name === 'ValidationError') {
+          next(new CastError('invalid data'));
+        }
+      })
       .then((user) => {
         if (user) {
-          return res.status(200).send({
+          return res.send({
             name: user.name,
             email: user.email,
             id: user._id,
           });
         }
-          throw new CastError('Invalid data.');
+        throw new CastError('Invalid data.');
       })
       .catch((err) => {
         if (err.name === 'ValidationError') {
           next(new CastError('invalid data'));
-        } else {
-          next(err);
         }
         if (err.code === 11000) {
           next(new ConflictError('User already exists.'));
@@ -66,12 +69,10 @@ module.exports.login = (req, res, next) => {
           if (!match) {
             throw new AuthorizationError('Incorrect email or password.');
           }
-          const token = jwt.sign(
-            { _id: user._id },
-            NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
-            { expiresIn: '7d' },
-          );
-        return res.send({ token });
+          const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
+            expiresIn: '7d',
+          });
+          return res.send({ token });
         })
         .catch(next);
     })

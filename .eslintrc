@@ -1,10 +1,8 @@
 {
-    "extends": "airbnb-base",
-    "rules": {
-      "array-callback-return": "off",
-      "indent": "off",
-      "no-console": "off",
-      "no-underscore-dangle": "off",
-      "no-unused-vars": ["error", { "argsIgnorePattern": "next" }]
-    }
+  "extends": "airbnb-base",
+  "rules": {
+    "no-console": "off",
+    "no-underscore-dangle": ["off", { "allow": ["id"] }],
+    "no-unused-vars": ["error", { "argsIgnorePattern": "next" }]
   }
+}
