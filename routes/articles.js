@@ -1,5 +1,4 @@
 const router = require('express').Router();
-const auth = require('../middleware/auth');
 
 const {
   getArticles,
@@ -12,10 +11,10 @@ const {
   articleIdValidation,
 } = require('../middleware/validation');
 
-router.get('/articles', auth, getArticles);
+router.get('/articles', getArticles);
 
-router.post('/articles', auth, articlesValidation, createArticle);
+router.post('/articles', articlesValidation, createArticle);
 
-router.delete('/articles/:articleId', auth, articleIdValidation, deleteArticle);
+router.delete('/articles/:articleId', articleIdValidation, deleteArticle);
 
 module.exports = router;
