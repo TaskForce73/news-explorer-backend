@@ -13,18 +13,12 @@ module.exports.getUser = (req, res, next) => {
     .orFail(() => {
       throw new NotFoundError('User id not found.');
     })
-    .then((user) => {
-      if (user) {
-        return res.send({ data: user });
-      }
-      throw new CastError('Invalid data.');
-    })
+    .then((user) => res.send({ data: user }))
     .catch(next);
 };
 
 module.exports.createUser = (req, res, next) => {
   const { name, email, password } = req.body;
-  if (!req.body.password) throw new AuthorizationError('Missing password field.');
   bcrypt.hash(password, 10).then((hash) => {
     User.create({
       name,
