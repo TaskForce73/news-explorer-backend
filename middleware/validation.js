@@ -1,12 +1,4 @@
 const { celebrate, Joi } = require('celebrate');
-const validator = require('validator');
-
-const validateLink = (value, helpers) => {
-  if (validator.isURL(value)) {
-    return value;
-  }
-  return helpers.error('string.uri');
-};
 
 const registerValidation = celebrate({
   body: Joi.object().keys({
@@ -25,13 +17,8 @@ const loginValidation = celebrate({
 
 const articlesValidation = celebrate({
   body: Joi.object().keys({
-    keyword: Joi.string().required(),
-    title: Joi.string().required(),
-    text: Joi.string().required(),
-    date: Joi.string().required(),
-    source: Joi.string().required(),
-    link: Joi.string().required().custom(validateLink),
-    image: Joi.string().required().custom(validateLink),
+    question: Joi.string().required(),
+    fromDate: Joi.string().required(),
   }),
 });
 

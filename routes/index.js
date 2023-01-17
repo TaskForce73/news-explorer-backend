@@ -12,9 +12,7 @@ const {
 router.post('/signup', registerValidation, createUser);
 router.post('/signin', loginValidation, login);
 
-router.use(auth);
-
-router.use('/', usersRouter);
+router.use('/users', auth, usersRouter);
 router.use('/', articlesRouter);
 router.use('*', nonExistRoute);
 

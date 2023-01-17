@@ -1,20 +1,23 @@
 const router = require('express').Router();
+const auth = require('../middleware/auth');
 
 const {
   getArticles,
-  createArticle,
   deleteArticle,
+  searchArticles,
+  getSavedArticles,
 } = require('../controllers/articles');
 
 const {
-  articlesValidation,
-  articleIdValidation,
+  articleIdValidation, articlesValidation,
 } = require('../middleware/validation');
 
-router.get('/articles', getArticles);
+router.get('/articles', auth, getArticles);
 
-router.post('/articles', articlesValidation, createArticle);
+router.post('/articles/saved-news', auth, articlesValidation, getSavedArticles);
 
-router.delete('/articles/:articleId', articleIdValidation, deleteArticle);
+router.post('/articles/everything', searchArticles);
+
+router.delete('/articles/:articleId', auth, articleIdValidation, deleteArticle);
 
 module.exports = router;

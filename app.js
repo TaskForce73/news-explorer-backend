@@ -11,7 +11,6 @@ const { PORT, MONGO_DB } = require('./utils/config');
 const router = require('./routes');
 
 const app = express();
-
 mongoose.connect(MONGO_DB);
 
 app.use(helmet());
