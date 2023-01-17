@@ -18,7 +18,7 @@ module.exports.getUser = (req, res, next) => {
 };
 
 module.exports.createUser = (req, res, next) => {
-  const { name, email, password } = req.body;
+  const { email, password, name } = req.body;
   bcrypt.hash(password, 10).then((hash) => {
     User.create({
       name,
@@ -27,18 +27,19 @@ module.exports.createUser = (req, res, next) => {
     })
       .catch((err) => {
         if (err.name === 'ValidationError') {
+          console.log(err.message);
           next(new CastError('invalid data'));
         }
       })
       .then((user) => {
-        if (user) {
-          return res.send({
-            name: user.name,
-            email: user.email,
-            id: user._id,
-          });
+        if (!user) {
+          throw new ConflictError('This email already exist');
         }
-        throw new CastError('Invalid data.');
+        return res.send({
+          name: user.name,
+          email: user.email,
+          id: user._id,
+        });
       })
       .catch((err) => {
         if (err.name === 'ValidationError') {
@@ -66,7 +67,7 @@ module.exports.login = (req, res, next) => {
           const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
             expiresIn: '7d',
           });
-          return res.send({ token });
+          return res.send({ token, name: user.name });
         })
         .catch(next);
     })

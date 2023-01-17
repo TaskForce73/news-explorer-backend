@@ -6,5 +6,8 @@ const {
 } = process.env;
 
 module.exports = {
-  JWT_SECRET, MONGO_DB, NODE_ENV, PORT,
+  JWT_SECRET,
+  MONGO_DB,
+  NODE_ENV,
+  PORT,
 };
