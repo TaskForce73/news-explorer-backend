@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const validator = require('validator');
+const mongoose = require("mongoose");
+const validator = require("validator");
 
 const articleSchema = new mongoose.Schema({
   keyword: {
@@ -31,7 +31,7 @@ const articleSchema = new mongoose.Schema({
       validator(url) {
         return validator.isURL(url);
       },
-      message: 'invalid URL',
+      message: "invalid URL",
     },
   },
   urlToImage: {
@@ -41,14 +41,14 @@ const articleSchema = new mongoose.Schema({
       validator(url) {
         return validator.isURL(url);
       },
-      message: 'invalid URL',
+      message: "invalid URL",
     },
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: 'user',
+    ref: "user",
   },
 });
 
-module.exports = mongoose.model('article', articleSchema);
+module.exports = mongoose.model("article", articleSchema);
